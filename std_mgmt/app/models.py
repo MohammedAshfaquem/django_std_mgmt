@@ -21,7 +21,8 @@ class Student(models.Model):
     department = models.CharField(max_length=50)
     year_of_admission = models.IntegerField()
     date_of_birth = models.DateField(null=True, blank=True)
-    
+    profile_pic = models.ImageField(upload_to="student_pics/", null=True, blank=True)  # 👈 added
+
 
     def __str__(self):
         return f"{self.name} ({self.roll_number})"

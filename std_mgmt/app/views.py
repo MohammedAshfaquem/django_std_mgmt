@@ -77,7 +77,7 @@ def student_create(request):
     current_user = get_object_or_404(Profile, id=user_id)
 
     if request.method == "POST":
-        form = StudentForm(request.POST)
+        form = StudentForm(request.POST, request.FILES)  # 👈 request.FILES added
         if form.is_valid():
             student = form.save(commit=False)
             student.profile = current_user
@@ -92,7 +92,7 @@ def student_create(request):
 def student_edit(request, pk):
     student = get_object_or_404(Student, pk=pk)
     if request.method == "POST":
-        form = StudentForm(request.POST, instance=student)
+        form = StudentForm(request.POST, request.FILES, instance=student)  # 👈 request.FILES added
         if form.is_valid():
             form.save()
             messages.success(request, "Student updated successfully!")
@@ -100,6 +100,7 @@ def student_edit(request, pk):
     else:
         form = StudentForm(instance=student)
     return render(request, 'student_edit.html', {'form': form})
+
 
 
 
