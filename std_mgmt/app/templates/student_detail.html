@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Student Details</h2>
+<ul class="list-group">
+  <li class="list-group-item"><strong>Name:</strong> {{ student.name }}</li>
+  <li class="list-group-item"><strong>Roll Number:</strong> {{ student.roll_number }}</li>
+  <li class="list-group-item"><strong>Email:</strong> {{ student.email }}</li>
+  <li class="list-group-item"><strong>Department:</strong> {{ student.department }}</li>
+  <li class="list-group-item"><strong>Year of Admission:</strong> {{ student.year_of_admission }}</li>
+  <li class="list-group-item"><strong>Date of Birth:</strong> {{ student.date_of_birth }}</li>
+</ul>
+<a href="{% url 'student_list' %}" class="btn btn-secondary mt-3">Back</a>
+{% endblock %}
