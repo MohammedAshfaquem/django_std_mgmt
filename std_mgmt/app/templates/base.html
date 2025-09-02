@@ -28,40 +28,66 @@
       </style>
     </head>
     <body>
-      <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="#">Student Managment</a>
-        <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav me-auto">
-            <li class="nav-item">
-              <a class="nav-link" href="{% url 'home' %}">Home</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="{% url 'student_list' %}">Students</a>
-            </li>
-            <!-- <li class="nav-item"><a class="nav-link" href="#">Profile</a></li> -->
-          </ul>
+      <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+  <div class="container">
+    <!-- Brand -->
+    <a class="navbar-brand fw-bold" href="{% url 'home' %}">🎓 Student Management</a>
 
-          <ul class="navbar-nav ms-auto">
-            <li class="nav-item">
-              <a class="nav-link text-danger" href="{% url 'login' %}">Logout</a>
+    <!-- Toggler for mobile -->
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+      aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- Navbar Links -->
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <!-- Center links -->
+      <ul class="navbar-nav mx-auto">
+        <li class="nav-item">
+          <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'home' %}">
+            Home
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.resolver_match.url_name == 'student_list' %}active{% endif %}" href="{% url 'student_list' %}">
+            Students
+          </a>
+        </li>
+      </ul>
+
+      <!-- Right side: Profile dropdown -->
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="profileDropdown" role="button"
+            data-bs-toggle="dropdown" aria-expanded="false">
+            <img src="{% if user.profile.profile_pic %}{{ user.profile.profile_pic.url }}{% else %}https://www.shutterstock.com/image-vector/user-profile-icon-vector-avatar-600nw-2558760599.jpg{% endif %}"
+              alt="Profile" width="30" height="30" class="rounded-circle me-2">
+            {{ user.name }}
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+            <li><a class="dropdown-item" href="{% url 'profile_view' %}">My Profile</a></li>
+            <li><a class="dropdown-item" href="{% url 'profile_edit' user.id %}">Edit Profile</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <form method="post" action="{% url 'login' %}">
+                {% csrf_token %}
+                <button type="submit" class="dropdown-item text-danger">Logout</button>
+              </form>
             </li>
           </ul>
-        </div>
-      </nav>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+
 
       
-      <div class="container mt-4 content">
-        {% if messages %}
-          {% for message in messages %}
-            <div class="alert alert-info">{{ message }}</div>
-          {% endfor %}
-        {% endif %}
-
-        
+      <div class="container mt-4 content">  
         <div class="mb-3">
           <a href="{% url 'student_create' %}" class="btn btn-primary">Add Student</a>
         </div>
-
         {% block content %}{% endblock %}
       </div>
 

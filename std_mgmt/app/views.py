@@ -2,28 +2,25 @@ from django.shortcuts import render,redirect,get_object_or_404
 from .forms import ProfileForm,StudentForm
 from .models import Profile,Student
 from django.contrib import messages
-from django.db.models import Q
+from  django.db.models import Q
 from django.core.paginator import Paginator
-
-
 
 
 def Register(request):
     if request.method == "POST":
         form = ProfileForm(request.POST)
         if form.is_valid():
-            form.save()
+            user = form.save()
+            request.session['user_id'] = user.id
             return redirect('home')
     else:
         form = ProfileForm()
     return render(request,'register.html',{'form':form})
 
-
 def Login(request):
     if request.method == "POST":
         name = request.POST.get('name')
         roll_number = request.POST.get('roll_number')
-
         try:
             user = Profile.objects.get(roll_number=roll_number)
             if user.name == name:
@@ -33,24 +30,37 @@ def Login(request):
                 messages.error(request, "Invalid name for this roll number.")
         except Profile.DoesNotExist:
             messages.error(request, "Invalid user. Please check your roll number.")
-
         return redirect('login')
-
     return render(request, 'login.html')
-
+                     
 def logout(request):
     request.session.flush()
     return redirect('login')
 
-
 def home_view(request):
     return render(request,'base.html',)
-
+    
+def profile_view(request,):
+    user_id = request.session.get('user_id')
+    user = Profile.objects.get(id=user_id)
+    return render(request, "profile.html", {"user": user})
+ 
+def profile_edit(request, pk):
+    profile = get_object_or_404(Profile, id=pk)
+    if request.method == "POST":
+        form = ProfileForm(request.POST, instance=profile)
+        if form.is_valid():
+            form.save()
+            return redirect("profile_view")
+    else:
+        form = ProfileForm(instance=profile)
+    return render(request, "profile_edit.html", {"form": form})
 
 def student_list(request):
     user_id = request.session.get('user_id')
     current_user = get_object_or_404(Profile, id=user_id)
     students = Student.objects.filter(profile=current_user)
+    
     query = request.GET.get('q')
     if query:
         students = students.filter(
@@ -69,15 +79,12 @@ def student_list(request):
         'page_obj': page_obj,
     })
 
-
-
-    
 def student_create(request):
     user_id = request.session.get('user_id')
     current_user = get_object_or_404(Profile, id=user_id)
 
     if request.method == "POST":
-        form = StudentForm(request.POST, request.FILES)  # 👈 request.FILES added
+        form = StudentForm(request.POST, request.FILES)
         if form.is_valid():
             student = form.save(commit=False)
             student.profile = current_user
@@ -88,11 +95,10 @@ def student_create(request):
         form = StudentForm()
     return render(request, 'student_create.html', {'form': form})
 
-
 def student_edit(request, pk):
     student = get_object_or_404(Student, pk=pk)
     if request.method == "POST":
-        form = StudentForm(request.POST, request.FILES, instance=student)  # 👈 request.FILES added
+        form = StudentForm(request.POST, request.FILES, instance=student)
         if form.is_valid():
             form.save()
             messages.success(request, "Student updated successfully!")
@@ -100,9 +106,6 @@ def student_edit(request, pk):
     else:
         form = StudentForm(instance=student)
     return render(request, 'student_edit.html', {'form': form})
-
-
-
 
 def student_delete(request, pk):
     student = get_object_or_404(Student, pk=pk)
@@ -115,4 +118,5 @@ def student_delete(request, pk):
 def student_detail(request, pk):
     student = get_object_or_404(Student, pk=pk)
     return render(request, 'student_detail.html', {'student': student})
+
 # Create your views here.

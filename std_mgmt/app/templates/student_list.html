@@ -1,9 +1,6 @@
-{% extends 'base.html' %} {% load static %}
-<!-- 👈 important -->
-{% block content %}
+{% extends 'base.html' %} {% load static %} {% block content %}
 <h2>Students</h2>
 
-<!-- Search Form -->
 <form method="GET" class="mb-3 d-flex">
   <input
     type="text"
@@ -15,12 +12,10 @@
   <button type="submit" class="btn btn-primary">Search</button>
 </form>
 
-<!-- Student Table -->
 <table class="table table-bordered">
   <thead>
     <tr>
       <th>Profile</th>
-      <!-- 👈 added this -->
       <th>Name</th>
       <th>Roll No</th>
       <th>Email</th>
@@ -56,26 +51,30 @@
       <td>{{ student.email }}</td>
       <td>{{ student.department }}</td>
       <td>{{ student.year_of_admission }}</td>
-      <!-- 👈 added year -->
       <td>
-        <!-- Example actions -->
+        <a
+          href="{% url 'student_detail' student.id %}"
+          class="btn btn-sm btn-info"
+        >
+          View
+        </a>
         <a
           href="{% url 'student_edit' student.id %}"
           class="btn btn-sm btn-warning"
-          >Edit</a
         >
+          Edit
+        </a>
         <a
           href="{% url 'student_delete' student.id %}"
           class="btn btn-sm btn-danger"
-          >Delete</a
         >
+          Delete
+        </a>
       </td>
     </tr>
     {% endfor %}
   </tbody>
 </table>
-
-<!-- Pagination -->
 <div class="d-flex justify-content-center">
   <nav>
     <ul class="pagination">
