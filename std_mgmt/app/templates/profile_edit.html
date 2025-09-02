@@ -1,10 +1,8 @@
-{% extends 'base.html' %}
-{% block content %}
-<div class="card shadow p-4" style="max-width: 500px; margin:auto;">
+{% extends 'base.html' %} {% block content %}
+<div class="card shadow p-4" style="max-width: 500px; margin: auto">
   <h3 class="text-center mb-4">Edit Profile</h3>
   <form method="POST">
-    {% csrf_token %}
-    {{ form.as_p }}
+    {% csrf_token %} {{ form.as_p }}
     <div class="d-grid">
       <button type="submit" class="btn btn-success">Save Changes</button>
     </div>

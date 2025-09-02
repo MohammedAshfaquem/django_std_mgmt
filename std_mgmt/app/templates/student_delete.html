@@ -1,14 +1,15 @@
-{% extends "base.html" %}
+{% extends "base.html" %} {% block content %}
+<div class="card shadow p-4">
+  <h3 class="text-danger">⚠️ Confirm Delete</h3>
+  <p>
+    Are you sure you want to delete <strong>{{ student.name }}</strong> (Roll
+    No: {{ student.roll_number }})?
+  </p>
 
-{% block content %}
-  <div class="card shadow p-4">
-    <h3 class="text-danger">⚠️ Confirm Delete</h3>
-    <p>Are you sure you want to delete <strong>{{ student.name }}</strong> (Roll No: {{ student.roll_number }})?</p>
-
-    <form method="post">
-      {% csrf_token %}
-      <button type="submit" class="btn btn-danger">Yes, Delete</button>
-      <a href="{% url 'student_list' %}" class="btn btn-secondary">Cancel</a>
-    </form>
-  </div>
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Yes, Delete</button>
+    <a href="{% url 'student_list' %}" class="btn btn-secondary">Cancel</a>
+  </form>
+</div>
 {% endblock %}
