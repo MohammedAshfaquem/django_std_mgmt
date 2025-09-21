@@ -31,7 +31,7 @@
   <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
       <div class="container">
-        <a class="navbar-brand fw-bold" href="{% url 'home' %}"
+        <a class="navbar-brand fw-bold" href="{% url 'admin_dashboard' %}"
           >🎓 Student Management</a
         >
 
@@ -52,7 +52,7 @@
             <li class="nav-item">
               <a
                 class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}"
-                href="{% url 'home' %}"
+                href="{% url 'admin_dashboard' %}"
               >
                 Home
               </a>

@@ -1,0 +1,18 @@
+{% extends 'base.html' %} {% block content %}
+
+<form action="" method="POST">
+  {% csrf_token %}
+  <input
+    type="text"
+    class="form-control"
+    id="find"
+    name="find"
+    placeholder="👤 Search Here"
+    required
+  />
+  <button type="submit">submit</button>
+</form>
+{% for s in std %}
+<h1>{{ s.name}}</h1>
+{% endfor %} 
+{% endblock %}

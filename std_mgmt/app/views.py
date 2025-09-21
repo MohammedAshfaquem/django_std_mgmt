@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404,HttpResponse
 from .forms import ProfileForm, StudentForm
 from .models import Profile, Student
 from django.contrib import messages
@@ -12,18 +12,42 @@ def login_required(view_func):
             return redirect('login')
         return view_func(request, *args, **kwargs)
     return wrapper
+    
+def admin_required(view_func):
+    def wrapper(request, *args, **kwargs):
+        user_id = request.session.get('user_id')
+        if not user_id:
+            return redirect('login')
+        user = get_object_or_404(Profile, id=user_id)
+        if user.role != 'admin':
+            return redirect('student_dashboard')
+        return view_func(request, *args, **kwargs)
+    return wrapper
+
+def student_required(view_func):
+    def wrapper(request, *args, **kwargs):
+        user_id = request.session.get('user_id')
+        if not user_id:
+            return redirect('login')
+        user = get_object_or_404(Profile, id=user_id)
+        if user.role != 'student':
+            return redirect('admin_dashboard')
+        return view_func(request, *args, **kwargs)
+    return wrapper
 
 def Register(request):
     if request.method == "POST":
         form = ProfileForm(request.POST)
         if form.is_valid():
             user = form.save()
-            request.session['user_id'] = user.id
-            return redirect('home')
+            request.session['user_id'] = user.id  
+            if user.role == "admin":
+                return redirect("admin_dashboard")
+            else:
+                return redirect("student_dashboard")
     else:
         form = ProfileForm()
-    return render(request, 'register.html', {'form': form})
-
+    return render(request, "register.html", {"form": form})
 
 def Login(request):
     if request.method == "POST":
@@ -33,7 +57,11 @@ def Login(request):
             user = Profile.objects.get(roll_number=roll_number)
             if user.name == name:
                 request.session['user_id'] = user.id
-                return redirect('home')
+                request.session['user_role'] = user.role
+                if user.role == "admin":
+                    return redirect("admin_dashboard")
+                else:
+                    return redirect("student_dashboard") 
             else:
                 messages.error(request, "Invalid name for this roll number.")
         except Profile.DoesNotExist:
@@ -41,23 +69,39 @@ def Login(request):
         return redirect('login')
     return render(request, 'login.html')
 
-
 def logout(request):
     request.session.flush()
     return redirect('login')
 
-
 @login_required
-def home_view(request):
+@admin_required
+def admin_dashboard(request):
     return render(request, 'base.html')
 
+@login_required
+@student_required
+def student_dashboard(request):
+    user_id = request.session.get("user_id")
+    user = get_object_or_404(Profile, id=user_id)
+    if request.method == "POST":
+        form = ProfileForm(request.POST, instance=user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Profile updated successfully!")
+            return redirect("student_dashboard")
+    else:
+        form = ProfileForm(instance=user)
+
+    return render(request, "student_dashboard.html", {
+        "user": user,
+        "form": form,
+    })
 
 @login_required
 def profile_view(request):
     user_id = request.session.get('user_id')
     user = get_object_or_404(Profile, id=user_id)
     return render(request, "profile.html", {"user": user})
-
 
 @login_required
 def profile_edit(request, pk):
@@ -71,7 +115,7 @@ def profile_edit(request, pk):
         form = ProfileForm(instance=profile)
     return render(request, "profile_edit.html", {"form": form})
 
-
+@admin_required
 @login_required
 def student_list(request):
     user_id = request.session.get('user_id')
@@ -96,7 +140,7 @@ def student_list(request):
         'page_obj': page_obj,
     })
 
-
+@admin_required
 @login_required
 def student_create(request):
     user_id = request.session.get('user_id')
@@ -114,7 +158,7 @@ def student_create(request):
         form = StudentForm()
     return render(request, 'student_create.html', {'form': form})
 
-
+@admin_required
 @login_required
 def student_edit(request, pk):
     student = get_object_or_404(Student, pk=pk)
@@ -128,7 +172,7 @@ def student_edit(request, pk):
         form = StudentForm(instance=student)
     return render(request, 'student_edit.html', {'form': form})
 
-
+@admin_required
 @login_required
 def student_delete(request, pk):
     student = get_object_or_404(Student, pk=pk)
@@ -138,8 +182,22 @@ def student_delete(request, pk):
         return redirect("student_list")
     return render(request, "student_delete.html", {"student": student})
 
-
+@admin_required
 @login_required
 def student_detail(request, pk):
     student = get_object_or_404(Student, pk=pk)
     return render(request, 'student_detail.html', {'student': student})
+
+
+def find(request):
+    if request.method == 'POST':
+        result = request.POST.get('find')
+        print(result)
+        try:
+            std = Student.objects.filter(name__contains =result)
+            print(std)
+            return render(request,"res.html",{"std":std})
+        except:
+            return HttpResponse("No User")
+    return render(request,'res.html',)
+

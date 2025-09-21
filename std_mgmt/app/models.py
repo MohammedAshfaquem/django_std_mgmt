@@ -2,7 +2,7 @@ from django.db import models
 
 class Profile(models.Model):
     name = models.CharField(max_length=30,null=False, blank=False)
-    role = models.CharField(max_length=10, choices=[('admin', 'Admin'), ('student', 'Student')])
+    role = models.CharField(max_length=10, choices=[('admin', 'Admin'), ('student', 'Student')],default='student')
     roll_number = models.CharField(max_length=20, null=False, blank=False,unique=True)
     department = models.CharField(max_length=50, null=False, blank=False)
     year_of_admission = models.IntegerField(null=False, blank=False)
